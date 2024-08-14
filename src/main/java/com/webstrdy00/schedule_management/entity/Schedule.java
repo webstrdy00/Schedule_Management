@@ -28,4 +28,8 @@ public class Schedule {
         this.createdAt = now;
         this.modifiedAt = now;
     }
+
+    public Schedule() {
+
+    }
 }
