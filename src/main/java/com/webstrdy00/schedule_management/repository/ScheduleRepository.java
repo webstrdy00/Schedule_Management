@@ -1,6 +1,7 @@
 package com.webstrdy00.schedule_management.repository;
 
 import com.webstrdy00.schedule_management.entity.Schedule;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Optional;
 
 @Repository
 public class ScheduleRepository {
@@ -37,5 +39,26 @@ public class ScheduleRepository {
 
         schedule.setId(keyHolder.getKey().longValue());
         return schedule;
+    }
+
+    public Schedule findById(Long id) {
+        String sql = "SELECT * FROM schedules WHERE id = ?";
+
+        return jdbcTemplate.query(sql, resultSet -> {
+            if (resultSet.next()){
+                Schedule schedule = new Schedule();
+                schedule.setId(resultSet.getLong("id"));
+                schedule.setTodo(resultSet.getString("todo"));
+                schedule.setAssignee(resultSet.getString("assignee"));
+                schedule.setPassword(resultSet.getString("password"));
+                schedule.setStartDate(resultSet.getTimestamp("start_date").toLocalDateTime());
+                schedule.setEndDate(resultSet.getTimestamp("end_date").toLocalDateTime());
+                schedule.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
+                schedule.setModifiedAt(resultSet.getTimestamp("modified_at").toLocalDateTime());
+                return schedule;
+            }else {
+                return null;
+            }
+        }, id);
     }
 }
