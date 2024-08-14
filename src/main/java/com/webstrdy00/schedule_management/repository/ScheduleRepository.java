@@ -1,15 +1,24 @@
 package com.webstrdy00.schedule_management.repository;
 
+import ch.qos.logback.core.util.StringUtil;
+import com.webstrdy00.schedule_management.dto.ScheduleSearchRequestDto;
 import com.webstrdy00.schedule_management.entity.Schedule;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.thymeleaf.util.StringUtils;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class ScheduleRepository {
@@ -60,5 +69,39 @@ public class ScheduleRepository {
                 return null;
             }
         }, id);
+    }
+
+    public List<Schedule> findAllByConditions(ScheduleSearchRequestDto requestDto) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM schedules WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        if (requestDto.getModifiedDate() != null){
+            sql.append(" AND DATE(modified_at) = ?");
+            params.add(requestDto.getModifiedDate());
+        }
+
+        if (requestDto.getAssignee() != null && !requestDto.getAssignee().isEmpty()){
+            sql.append(" AND assignee = ?");
+            params.add(requestDto.getAssignee());
+        }
+
+        sql.append(" ORDER BY modified_at DESC");
+
+        return jdbcTemplate.query(sql.toString(), new ScheduleRowMapper(), params.toArray());
+    }
+
+    private static class ScheduleRowMapper implements RowMapper<Schedule> {
+        @Override
+        public Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Schedule schedule = new Schedule();
+            schedule.setId(rs.getLong("id"));
+            schedule.setTodo(rs.getString("todo"));
+            schedule.setAssignee(rs.getString("assignee"));
+            schedule.setStartDate(rs.getTimestamp("start_date").toLocalDateTime());
+            schedule.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
+            schedule.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+            schedule.setModifiedAt(rs.getTimestamp("modified_at").toLocalDateTime());
+            return schedule;
+        }
     }
 }
