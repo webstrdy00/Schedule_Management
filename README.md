@@ -1,36 +1,3 @@
-schedule_api
-﻿
+# 주특기 개인 과제 Api 명세서(schedule)
 
-POST
-일정 작성
-http://localhost:8080/api/schedules
-﻿
-
-Body
-raw (json)
-json
-{
-    "work" : "영양제 먹기",
-    "manager" : "donghwi",
-    "password" : 12345
-}
-GET
-선택 일정 조회
-http://localhost:8080/api/schedules/{{id}}
-﻿
-
-GET
-일정 목록 조회
-http://localhost:8080/api/schedules
-﻿
-
-PUT
-선택한 일정 수정
-http://localhost:8080/api/schedules/{{id}}
-﻿
-
-DELETE
-선택한 일정 삭제
-http://localhost:8080/api/schedules/{{id}}
-﻿
-
+[[일정 관리] API 설계하기](%E1%84%8C%E1%85%AE%E1%84%90%E1%85%B3%E1%86%A8%E1%84%80%E1%85%B5%20%E1%84%80%E1%85%A2%E1%84%8B%E1%85%B5%E1%86%AB%20%E1%84%80%E1%85%AA%E1%84%8C%E1%85%A6%20Api%20%E1%84%86%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A6%E1%84%89%E1%85%A5(schedule)%2017b0bb0407a44f9890d0c5abd28552ab/%5B%E1%84%8B%E1%85%B5%E1%86%AF%E1%84%8C%E1%85%A5%E1%86%BC%20%E1%84%80%E1%85%AA%E1%86%AB%E1%84%85%E1%85%B5%5D%20API%20%E1%84%89%E1%85%A5%E1%86%AF%E1%84%80%E1%85%A8%E1%84%92%E1%85%A1%E1%84%80%E1%85%B5%20bb5086cc2fdb43caa83da65d99fa8988.csv)
