@@ -12,4 +12,10 @@ public class ScheduleRequestDto {
     private String password;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+
+    public ScheduleRequestDto(String todo, String assignee, String password){
+        this.todo = todo;
+        this.assignee = assignee;
+        this.password= password;
+    }
 }
