@@ -90,6 +90,11 @@ public class ScheduleRepository {
         return jdbcTemplate.query(sql.toString(), new ScheduleRowMapper(), params.toArray());
     }
 
+    public int updateSchedule(Long id, String todo, String assignee, LocalDateTime modifiedAt) {
+        String sql = "UPDATE schedules SET todo = ?, assignee = ?, modified_at = ? WHERE id = ?";
+        return jdbcTemplate.update(sql, todo, assignee, modifiedAt, id);
+    }
+
     private static class ScheduleRowMapper implements RowMapper<Schedule> {
         @Override
         public Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {

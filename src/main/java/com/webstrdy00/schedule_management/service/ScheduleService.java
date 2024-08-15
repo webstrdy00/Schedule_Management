@@ -4,7 +4,9 @@ import com.webstrdy00.schedule_management.dto.ScheduleRequestDto;
 import com.webstrdy00.schedule_management.dto.ScheduleResponseDto;
 import com.webstrdy00.schedule_management.dto.ScheduleSearchRequestDto;
 import com.webstrdy00.schedule_management.entity.Schedule;
+import com.webstrdy00.schedule_management.exception.PasswordMismatchException;
 import com.webstrdy00.schedule_management.exception.ScheduleNotFoundException;
+import com.webstrdy00.schedule_management.exception.ScheduleUpdateFailedException;
 import com.webstrdy00.schedule_management.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
 
@@ -44,5 +46,27 @@ public class ScheduleService {
         List<Schedule> schedules = scheduleRepository.findAllByConditions(requestDto);
         return schedules.stream()
                 .map(ScheduleResponseDto::new).toList();
+    }
+
+    public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto requestDto) {
+        Schedule schedule = scheduleRepository.findById(id);
+        if (schedule == null)
+            throw new ScheduleNotFoundException("일정을 찾을 수 없습니다.");
+
+        if(!requestDto.getPassword().equals(schedule.getPassword()))
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
+
+        LocalDateTime modifiedAt = LocalDateTime.now();
+        String newTodo = requestDto.getTodo() != null ? requestDto.getTodo() : schedule.getTodo();
+        String newAssignee = requestDto.getAssignee() != null ? requestDto.getAssignee() : schedule.getAssignee();
+        int updatedRows = scheduleRepository.updateSchedule(id, newTodo, newAssignee, modifiedAt);
+
+        if (updatedRows == 0)
+            throw new ScheduleUpdateFailedException("수정에 실패했습니다.");
+
+        Schedule updateSchedule = scheduleRepository.findById(id);
+
+        ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(updateSchedule);
+        return scheduleResponseDto;
     }
 }
