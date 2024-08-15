@@ -39,4 +39,13 @@ public class ScheduleController {
         ScheduleResponseDto responseDto = scheduleService.updateSchedule(id, requestDto);
         return responseDto;
     }
+
+    @DeleteMapping("/schedules/{id}")
+    public Long deleteSchedule(@PathVariable Long id, @RequestBody ScheduleRequestDto requestDto){
+        String password = requestDto.getPassword();
+        if (password == null)
+            throw new IllegalArgumentException("비밀번호는 필수로 입력해야 합니다.");
+
+        return scheduleService.deleteSchedule(id, requestDto);
+    }
 }

@@ -95,6 +95,11 @@ public class ScheduleRepository {
         return jdbcTemplate.update(sql, todo, assignee, modifiedAt, id);
     }
 
+    public int deleteSchedule(Long id) {
+        String sql = "DELETE FROM schedules WHERE id = ?";
+        return jdbcTemplate.update(sql, id);
+    }
+
     private static class ScheduleRowMapper implements RowMapper<Schedule> {
         @Override
         public Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
