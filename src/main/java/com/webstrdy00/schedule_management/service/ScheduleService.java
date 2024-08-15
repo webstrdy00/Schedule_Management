@@ -5,6 +5,7 @@ import com.webstrdy00.schedule_management.dto.ScheduleResponseDto;
 import com.webstrdy00.schedule_management.dto.ScheduleSearchRequestDto;
 import com.webstrdy00.schedule_management.entity.Schedule;
 import com.webstrdy00.schedule_management.exception.PasswordMismatchException;
+import com.webstrdy00.schedule_management.exception.ScheduleDeleteFailedException;
 import com.webstrdy00.schedule_management.exception.ScheduleNotFoundException;
 import com.webstrdy00.schedule_management.exception.ScheduleUpdateFailedException;
 import com.webstrdy00.schedule_management.repository.ScheduleRepository;
@@ -68,5 +69,20 @@ public class ScheduleService {
 
         ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(updateSchedule);
         return scheduleResponseDto;
+    }
+
+    public Long deleteSchedule(Long id, ScheduleRequestDto requestDto) {
+        Schedule schedule = scheduleRepository.findById(id);
+        if (schedule == null)
+            throw new ScheduleNotFoundException("일정을 찾을 수 없습니다.");
+
+        if (!requestDto.getPassword().equals(schedule.getPassword()))
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
+
+        int deleteRows = scheduleRepository.deleteSchedule(id);
+        if (deleteRows == 0)
+            throw new ScheduleDeleteFailedException("일정 삭제에 실패했습니다.");
+
+        return id;
     }
 }
