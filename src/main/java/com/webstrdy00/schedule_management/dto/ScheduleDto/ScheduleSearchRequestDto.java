@@ -1,4 +1,4 @@
-package com.webstrdy00.schedule_management.dto;
+package com.webstrdy00.schedule_management.dto.ScheduleDto;
 
 import lombok.Getter;
 import lombok.Setter;

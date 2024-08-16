@@ -1,8 +1,9 @@
 package com.webstrdy00.schedule_management.service;
 
-import com.webstrdy00.schedule_management.dto.ScheduleRequestDto;
-import com.webstrdy00.schedule_management.dto.ScheduleResponseDto;
-import com.webstrdy00.schedule_management.dto.ScheduleSearchRequestDto;
+import com.webstrdy00.schedule_management.dto.ScheduleDto.ScheduleRequestDto;
+import com.webstrdy00.schedule_management.dto.ScheduleDto.ScheduleResponseDto;
+import com.webstrdy00.schedule_management.dto.ScheduleDto.ScheduleSearchRequestDto;
+import com.webstrdy00.schedule_management.entity.Assignee;
 import com.webstrdy00.schedule_management.entity.Schedule;
 import com.webstrdy00.schedule_management.exception.PasswordMismatchException;
 import com.webstrdy00.schedule_management.exception.ScheduleDeleteFailedException;
@@ -17,13 +18,23 @@ import java.util.List;
 @Service
 public class ScheduleService {
     private ScheduleRepository scheduleRepository;
-    public ScheduleService(ScheduleRepository scheduleRepository){
+    private AssigneeService assigneeService;
+    public ScheduleService(ScheduleRepository scheduleRepository, AssigneeService assigneeService){
         this.scheduleRepository = scheduleRepository;
+        this.assigneeService = assigneeService;
     }
 
     public ScheduleResponseDto createSchedule(ScheduleRequestDto requestDto) {
-        LocalDateTime now = LocalDateTime.now();
-        Schedule schedule = new Schedule(requestDto, now);
+        Assignee assignee = assigneeService.getAssigneeById(requestDto.getAssigneeId());
+
+        Schedule schedule = new Schedule();
+        schedule.setTodo(requestDto.getTodo());
+        schedule.setAssigneeId(requestDto.getAssigneeId());
+        schedule.setPassword(requestDto.getPassword());
+        schedule.setStartDate(requestDto.getStartDate());
+        schedule.setEndDate(requestDto.getEndDate());
+        schedule.setCreatedAt(LocalDateTime.now());
+        schedule.setModifiedAt(LocalDateTime.now());
 
         Schedule saveSchedule = scheduleRepository.save(schedule);
 
@@ -32,7 +43,7 @@ public class ScheduleService {
         return scheduleResponseDto;
     }
 
-    public ScheduleResponseDto getSchedule(Long id) {
+    public ScheduleResponseDto getScheduleById(Long id) {
         Schedule schedule = scheduleRepository.findById(id);
         if (schedule == null){
             throw new ScheduleNotFoundException("일정을 찾을 수 없습니다.");
@@ -41,6 +52,10 @@ public class ScheduleService {
         ScheduleResponseDto responseDto = new ScheduleResponseDto(schedule);
 
         return responseDto;
+    }
+
+    public List<Schedule> getScheduleByAssigneeId(Long assigneeId){
+        return scheduleRepository.findByAssigneeId(assigneeId);
     }
 
     public List<ScheduleResponseDto> getScheduleList(ScheduleSearchRequestDto requestDto) {
@@ -59,16 +74,14 @@ public class ScheduleService {
 
         LocalDateTime modifiedAt = LocalDateTime.now();
         String newTodo = requestDto.getTodo() != null ? requestDto.getTodo() : schedule.getTodo();
-        String newAssignee = requestDto.getAssignee() != null ? requestDto.getAssignee() : schedule.getAssignee();
-        int updatedRows = scheduleRepository.updateSchedule(id, newTodo, newAssignee, modifiedAt);
+        int updatedRows = scheduleRepository.updateSchedule(id, newTodo, modifiedAt);
 
         if (updatedRows == 0)
             throw new ScheduleUpdateFailedException("수정에 실패했습니다.");
 
         Schedule updateSchedule = scheduleRepository.findById(id);
 
-        ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(updateSchedule);
-        return scheduleResponseDto;
+        return new ScheduleResponseDto(updateSchedule);
     }
 
     public Long deleteSchedule(Long id, ScheduleRequestDto requestDto) {

@@ -1,4 +1,4 @@
-package com.webstrdy00.schedule_management.dto;
+package com.webstrdy00.schedule_management.dto.ScheduleDto;
 
 import com.webstrdy00.schedule_management.entity.Schedule;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class ScheduleResponseDto {
     private Long id;
     private String todo;
-    private String assignee;
+    private Long assigneeId;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private LocalDateTime createAt;
@@ -19,7 +19,7 @@ public class ScheduleResponseDto {
     public ScheduleResponseDto(Schedule schedule) {
         this.id = schedule.getId();
         this.todo = schedule.getTodo();
-        this.assignee = schedule.getAssignee();
+        this.assigneeId = schedule.getAssigneeId();
         this.startDate = schedule.getStartDate();
         this.endDate = schedule.getEndDate();
         this.createAt = schedule.getCreatedAt();
